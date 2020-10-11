@@ -19,7 +19,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class JwtTokenProvider {
+public class JwtProvider {
 
     private String secretkey = "Leem Dong Hun";
 

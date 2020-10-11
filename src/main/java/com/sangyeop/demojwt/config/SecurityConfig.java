@@ -1,7 +1,7 @@
 package com.sangyeop.demojwt.config;
 
 import com.sangyeop.demojwt.account.JwtAuthenticationFilter;
-import com.sangyeop.demojwt.account.JwtTokenProvider;
+import com.sangyeop.demojwt.account.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProvider jwtProvider;
 
     @Bean
     @Override
@@ -34,6 +34,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/accounts/sign-up", "/api/accounts/sign-in").permitAll()
                 .anyRequest().hasRole("USER")
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
     }
 }

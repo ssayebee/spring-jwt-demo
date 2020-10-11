@@ -18,7 +18,7 @@ public class AccountController {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProvider jwtProvider;
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@RequestBody Map<String, String> user) {
@@ -32,20 +32,19 @@ public class AccountController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody Map<String, String> user) {
-        System.out.println("Controller");
         Account account = accountRepository.findByEmail(user.get("email"))
                 .orElseThrow(() -> new UsernameNotFoundException("가입되지 않은 E-MAIL 입니다."));
         if(!passwordEncoder.matches(user.get("password"), account.getPassword())) {
             return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
         }
-        String token = jwtTokenProvider.createToken(account.getEmail(), account.getRoles());
+        String token = jwtProvider.createToken(account.getEmail(), account.getRoles());
         return new ResponseEntity<>("{\"token\" :\"" + token + "\" }" , HttpStatus.OK);
     }
 
     @GetMapping("/detail")
     public ResponseEntity<?> needAuthentication(HttpServletRequest request) {
-        String token =  jwtTokenProvider.resolveToken(request);
-        String result = jwtTokenProvider.getUserPk(token);
+        String token =  jwtProvider.resolveToken(request);
+        String result = jwtProvider.getUserPk(token);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
