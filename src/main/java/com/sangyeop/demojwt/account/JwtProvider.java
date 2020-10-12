@@ -54,12 +54,15 @@ public class JwtProvider {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("X-AUTH-TOKEN");
+        return request.getHeader("Authorization");
     }
 
     public boolean validateToken(String jwtToken) {
+        if (!jwtToken.startsWith("Bearer ")) {
+            return false;
+        }
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretkey).parseClaimsJws(jwtToken);
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretkey).parseClaimsJws(jwtToken.substring(7));
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;

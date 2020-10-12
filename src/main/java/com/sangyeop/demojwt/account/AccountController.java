@@ -3,9 +3,9 @@ package com.sangyeop.demojwt.account;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
@@ -22,9 +22,14 @@ public class AccountController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@RequestBody Map<String, String> user) {
+        String email = user.get("email");
+        String password = user.get("password");
+        if(accountRepository.findByEmail(email).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exist Account!");
+        }
         accountRepository.save(Account.builder()
-                .email(user.get("email"))
-                .password(passwordEncoder.encode(user.get("password")))
+                .email(email)
+                .password(passwordEncoder.encode(password))
                 .roles(Collections.singletonList("ROLE_USER"))
                 .build());
         return new ResponseEntity<>("{}", HttpStatus.CREATED);
@@ -33,9 +38,9 @@ public class AccountController {
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody Map<String, String> user) {
         Account account = accountRepository.findByEmail(user.get("email"))
-                .orElseThrow(() -> new UsernameNotFoundException("가입되지 않은 E-MAIL 입니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Not Found!"));
         if(!passwordEncoder.matches(user.get("password"), account.getPassword())) {
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password Incorrect!");
         }
         String token = jwtProvider.createToken(account.getEmail(), account.getRoles());
         return new ResponseEntity<>("{\"token\" :\"" + token + "\" }" , HttpStatus.OK);
