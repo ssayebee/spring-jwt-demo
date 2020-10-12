@@ -58,11 +58,8 @@ public class JwtProvider {
     }
 
     public boolean validateToken(String jwtToken) {
-        if (!jwtToken.startsWith("Bearer ")) {
-            return false;
-        }
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretkey).parseClaimsJws(jwtToken.substring(7));
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretkey).parseClaimsJws(jwtToken);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
