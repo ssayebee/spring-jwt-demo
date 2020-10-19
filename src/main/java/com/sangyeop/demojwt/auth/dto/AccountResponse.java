@@ -1,5 +1,6 @@
-package com.sangyeop.demojwt.auth;
+package com.sangyeop.demojwt.auth.dto;
 
+import com.sangyeop.demojwt.auth.Account;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -11,7 +12,7 @@ import java.util.Collections;
 @AllArgsConstructor
 @Builder
 @Getter
-public class AccountDTO {
+public class AccountResponse {
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     @NotBlank
     private String email;

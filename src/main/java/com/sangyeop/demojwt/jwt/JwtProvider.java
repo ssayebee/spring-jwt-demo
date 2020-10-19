@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,9 +22,8 @@ import java.util.List;
 @Component
 public class JwtProvider {
 
-    private String secretkey = "Leem Dong Hun";
-
-    private Long tokenValidTime = 30 * 60 * 1000L;
+    @Value("${secret-key}")
+    private String secretkey;
 
     private final UserDetailsService userDetailsService;
 
@@ -35,6 +35,7 @@ public class JwtProvider {
     public String createToken(String userPk, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(userPk);
         claims.put("roles", roles);
+        long tokenValidTime = 30 * 60 * 1000L;
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)

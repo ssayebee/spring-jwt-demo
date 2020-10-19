@@ -7,7 +7,6 @@ import java.time.LocalDate;
 
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor @AllArgsConstructor
 @Entity(name = "expired_token")
 public class Token {

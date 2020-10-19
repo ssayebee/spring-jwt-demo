@@ -17,8 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -53,6 +52,10 @@ class AccountRepositoryTest {
         assertThat(savedAccount.getEmail()).isEqualTo(foundAccount.getEmail());
         assertThat(savedAccount.getPassword()).isEqualTo(foundAccount.getPassword());
         assertThat(savedAccount.getRoles().toArray()).isEqualTo(foundAccount.getRoles().toArray());
+        assertTrue(foundAccount.isAccountNonExpired());
+        assertTrue(foundAccount.isAccountNonLocked());
+        assertTrue(foundAccount.isCredentialsNonExpired());
+        assertTrue(foundAccount.isEnabled());
     }
 
     @Test

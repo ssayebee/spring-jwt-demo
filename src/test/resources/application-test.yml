@@ -10,3 +10,4 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+secret-key: 2l5DnaZnU7cuLF27JAPZqVpHsfJ0LEss

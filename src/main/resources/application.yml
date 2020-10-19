@@ -12,3 +12,4 @@ spring:
 server:
   error:
     include-message: always
+secret-key: 2l5DnaZnU7cuLF27JAPZqVpHsfJ0LEss

@@ -1,6 +1,7 @@
 package com.sangyeop.demojwt.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sangyeop.demojwt.auth.dto.AccountResponse;
 import com.sangyeop.demojwt.jwt.TokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +52,7 @@ class AccountControllerTest {
     }
 
     public void signUp(String email, String password) throws Exception  {
-        AccountDTO user = AccountDTO.builder()
+        AccountResponse user = AccountResponse.builder()
                 .email(email)
                 .password(password)
                 .build();
@@ -73,7 +74,7 @@ class AccountControllerTest {
     @DisplayName("POST /api/auth/sign-up 400 InValid Params")
     @MethodSource("signUpSource")
     public void signUpFail(String email, String password, String message) throws Exception {
-        AccountDTO user = AccountDTO.builder()
+        AccountResponse user = AccountResponse.builder()
                 .email(email)
                 .password(password)
                 .build();
@@ -106,7 +107,7 @@ class AccountControllerTest {
         String password = "password";
         signUp(email, password);
 
-        AccountDTO user = AccountDTO.builder()
+        AccountResponse user = AccountResponse.builder()
                 .email(email)
                 .password(password)
                 .build();
@@ -124,7 +125,7 @@ class AccountControllerTest {
         String email = "test@email.com";
         String password = "password";
         signUp(email, password);
-        AccountDTO user = AccountDTO.builder()
+        AccountResponse user = AccountResponse.builder()
                 .email(email)
                 .password(password)
                 .build();
@@ -143,7 +144,7 @@ class AccountControllerTest {
         String password = "password";
         signUp(email, password);
 
-        AccountDTO user = AccountDTO.builder()
+        AccountResponse user = AccountResponse.builder()
                 .email(email)
                 .password("wrong password")
                 .build();
@@ -171,7 +172,7 @@ class AccountControllerTest {
         String password = "password";
         signUp(email, password);
 
-        AccountDTO user = AccountDTO.builder()
+        AccountResponse user = AccountResponse.builder()
                 .email(email)
                 .password(password)
                 .build();
@@ -197,7 +198,7 @@ class AccountControllerTest {
         String password = "password";
         signUp(email, password);
 
-        AccountDTO user = AccountDTO.builder()
+        AccountResponse user = AccountResponse.builder()
                 .email(email)
                 .password(password)
                 .build();

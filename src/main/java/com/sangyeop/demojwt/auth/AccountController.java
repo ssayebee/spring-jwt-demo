@@ -1,5 +1,6 @@
 package com.sangyeop.demojwt.auth;
 
+import com.sangyeop.demojwt.auth.dto.AccountResponse;
 import com.sangyeop.demojwt.jwt.JwtProvider;
 import com.sangyeop.demojwt.jwt.Token;
 import com.sangyeop.demojwt.jwt.TokenRepository;
@@ -28,25 +29,25 @@ public class AccountController {
     private final JwtProvider jwtProvider;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<?> signUp(@RequestBody @Valid AccountDTO accountDTO, Errors errors) {
+    public ResponseEntity<?> signUp(@RequestBody @Valid AccountResponse accountResponse, Errors errors) {
         if(errors.hasErrors()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Field Validation Error!");
         }
 
-        if(accountRepository.findByEmail(accountDTO.getEmail()).isPresent()) {
+        if(accountRepository.findByEmail(accountResponse.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exist Account!");
         }
 
-        accountRepository.save(accountDTO.toEntity(passwordEncoder));
+        accountRepository.save(accountResponse.toEntity(passwordEncoder));
         return new ResponseEntity<>("{}", HttpStatus.CREATED);
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<?> signIn(@RequestBody @Valid AccountDTO accountDTO, Errors errors) {
-        Account account = accountRepository.findByEmail(accountDTO.getEmail())
+    public ResponseEntity<?> signIn(@RequestBody @Valid AccountResponse accountResponse, Errors errors) {
+        Account account = accountRepository.findByEmail(accountResponse.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Not Found!"));
 
-        if(!passwordEncoder.matches(accountDTO.getPassword(), account.getPassword())) {
+        if(!passwordEncoder.matches(accountResponse.getPassword(), account.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password Incorrect!");
         }
 
