@@ -1,6 +1,7 @@
-package com.sangyeop.demojwt.account;
+package com.sangyeop.demojwt.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sangyeop.demojwt.jwt.TokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -38,6 +40,9 @@ class AccountControllerTest {
     AccountRepository accountRepository;
 
     @Autowired
+    TokenRepository tokenRepository;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     @BeforeEach
@@ -51,7 +56,7 @@ class AccountControllerTest {
                 .password(password)
                 .build();
 
-        mockMvc.perform(post("/api/accounts/sign-up")
+        mockMvc.perform(post("/api/auth/sign-up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -59,21 +64,21 @@ class AccountControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 성공")
+    @DisplayName("POST /api/auth/sign-up 201")
     public void signUpSuccess() throws Exception {
         signUp("test@email.com", "password");
     }
 
-    @ParameterizedTest(name = "{index}) email={0}, password={1}")
-    @DisplayName("회원가입 실패 유효성 검증")
+    @ParameterizedTest(name = "{2}")
+    @DisplayName("POST /api/auth/sign-up 400 InValid Params")
     @MethodSource("signUpSource")
-    public void signUpFail(String email, String password) throws Exception {
+    public void signUpFail(String email, String password, String message) throws Exception {
         AccountDTO user = AccountDTO.builder()
                 .email(email)
                 .password(password)
                 .build();
 
-        mockMvc.perform(post("/api/accounts/sign-up")
+        mockMvc.perform(post("/api/auth/sign-up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -82,21 +87,20 @@ class AccountControllerTest {
 
     private static Stream<Arguments> signUpSource() {
         return Stream.of(
-                Arguments.of(null, null),
-                Arguments.of(null, "password"),
-                Arguments.of("test@email.com", null),
-                Arguments.of("test@email.com", ""),
-                Arguments.of("", ""),
-                Arguments.of("test@email.com", ""),
-                Arguments.of("", "password"),
-                Arguments.of("t", "password"),
-                Arguments.of("t@", "password"),
-                Arguments.of("@t", "password")
+                Arguments.of(null, null, "email: null, password: null"),
+                Arguments.of(null, "password", "email: null"),
+                Arguments.of("test@email.com", null, "password: null"),
+                Arguments.of("", "", "email: empty, password: empty"),
+                Arguments.of("test@email.com", "", "password: empty"),
+                Arguments.of("", "password", "email: empty"),
+                Arguments.of("t", "password", "email: t"),
+                Arguments.of("t@", "password", "email: t@"),
+                Arguments.of("@t", "password", "email: @t")
         );
     }
 
     @Test
-    @DisplayName("회원가입 실패 중복된 아이디")
+    @DisplayName("POST /api/auth/sign-up 400 Duplicate Eamil")
     public void signUpDuplicateEmail() throws Exception {
         String email = "email@email.com";
         String password = "password";
@@ -107,7 +111,7 @@ class AccountControllerTest {
                 .password(password)
                 .build();
 
-        mockMvc.perform(post("/api/accounts/sign-up")
+        mockMvc.perform(post("/api/auth/sign-up")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -115,7 +119,7 @@ class AccountControllerTest {
     }
 
     @Test
-    @DisplayName("로그인 성공 테스트")
+    @DisplayName("POST /api/auth/sign-in 200")
     public void signInSuccess() throws Exception {
         String email = "test@email.com";
         String password = "password";
@@ -125,7 +129,7 @@ class AccountControllerTest {
                 .password(password)
                 .build();
 
-        mockMvc.perform(post("/api/accounts/sign-in")
+        mockMvc.perform(post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -133,7 +137,7 @@ class AccountControllerTest {
     }
 
     @Test
-    @DisplayName("로그인 실패 비밀번호 불일치")
+    @DisplayName("POST /api/auth/sign-in 400 Wrong Password")
     public void signUpFail() throws Exception {
         String email = "test@email.com";
         String password = "password";
@@ -144,7 +148,7 @@ class AccountControllerTest {
                 .password("wrong password")
                 .build();
 
-        mockMvc.perform(post("/api/accounts/sign-in")
+        mockMvc.perform(post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -152,16 +156,16 @@ class AccountControllerTest {
     }
 
     @Test
-    @DisplayName("JWT 없이 Detail 조회 -> 401")
+    @DisplayName("GET /api/auth/detail 401")
     public void getDeatilWithoutToken() throws Exception {
-        mockMvc.perform(get("/api/accounts/detail")
+        mockMvc.perform(get("/api/auth/detail")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    @DisplayName("JWT로 Detail 조회")
+    @DisplayName("GET /api/auth/detail 200")
     public void getDeatialWithToken() throws Exception {
         String email = "test@email.com";
         String password = "password";
@@ -172,7 +176,7 @@ class AccountControllerTest {
                 .password(password)
                 .build();
 
-        ResultActions resultActions = mockMvc.perform(post("/api/accounts/sign-in")
+        ResultActions resultActions = mockMvc.perform(post("/api/auth/sign-in")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
                 .andDo(print())
@@ -180,10 +184,48 @@ class AccountControllerTest {
 
         String token = resultActions.andReturn().getResponse().getContentAsString();
 
-        mockMvc.perform(get("/api/accounts/detail")
+        mockMvc.perform(get("/api/auth/detail")
                 .header(HttpHeaders.AUTHORIZATION, token))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/sign-out 200")
+    public void signOut() throws Exception {
+        String email = "logout@email.com";
+        String password = "password";
+        signUp(email, password);
+
+        AccountDTO user = AccountDTO.builder()
+                .email(email)
+                .password(password)
+                .build();
+
+        ResultActions resultActions = mockMvc.perform(post("/api/auth/sign-in")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(user)))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        String token = resultActions.andReturn().getResponse().getContentAsString();
+
+        mockMvc.perform(get("/api/auth/detail")
+                .header(HttpHeaders.AUTHORIZATION, token))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/auth/sign-out")
+                .header(HttpHeaders.AUTHORIZATION, token))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        assertTrue(tokenRepository.existsByToken(token));
+
+        mockMvc.perform(get("/api/auth/detail")
+                .header(HttpHeaders.AUTHORIZATION, token))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
     }
 
 }

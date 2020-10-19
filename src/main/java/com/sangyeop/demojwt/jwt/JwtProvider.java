@@ -1,4 +1,4 @@
-package com.sangyeop.demojwt.account;
+package com.sangyeop.demojwt.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

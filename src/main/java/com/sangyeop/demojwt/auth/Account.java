@@ -1,4 +1,4 @@
-package com.sangyeop.demojwt.account;
+package com.sangyeop.demojwt.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

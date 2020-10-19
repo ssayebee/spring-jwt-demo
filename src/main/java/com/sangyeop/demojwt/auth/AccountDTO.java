@@ -1,4 +1,4 @@
-package com.sangyeop.demojwt.account;
+package com.sangyeop.demojwt.auth;
 
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;

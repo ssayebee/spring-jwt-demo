@@ -1,4 +1,4 @@
-package com.sangyeop.demojwt.account;
+package com.sangyeop.demojwt.auth;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ class AccountRepositoryTest {
     }
 
     @Test
-    @DisplayName("Account 저장 테스트")
+    @DisplayName("Create Account")
     public void accountSave() {
         Account savedAccount = saveAccount("test@email.com", "password");
         Account foundAccount = accountRepository.findByEmail("test@email.com").orElseThrow(
@@ -56,7 +56,7 @@ class AccountRepositoryTest {
     }
 
     @Test
-    @DisplayName("Account email Uniq")
+    @DisplayName("Account Email Unique")
     public void accountEmailUniq() {
         String email = "test@email.com";
 
@@ -69,7 +69,7 @@ class AccountRepositoryTest {
 
 
     @Test
-    @DisplayName("Account Email 길이 제한 -> 50")
+    @DisplayName("Account Email Length Limit 50")
     public void accountEmailLength() {
         String lessThenEqaulFifty = IntStream.rangeClosed(1, 50).mapToObj(i -> "x").collect(Collectors.joining());
         assertDoesNotThrow(
@@ -84,7 +84,7 @@ class AccountRepositoryTest {
     }
 
     @Test
-    @DisplayName("Account Password 길이 제한 -> 300")
+    @DisplayName("Account Password Length Limit 300")
     public void accountPasswordLength() {
         String lessThenEqualThreeHundreds = IntStream.rangeClosed(1, 300).mapToObj(i -> "x").collect(Collectors.joining());
         assertDoesNotThrow(
@@ -98,7 +98,7 @@ class AccountRepositoryTest {
     }
 
     @Test
-    @DisplayName("Account 삭제 테스트")
+    @DisplayName("Delete Account")
     public void accountDelete() {
         String email = "deleted@email.com";
         Account savedAccount = saveAccount(email, "password");

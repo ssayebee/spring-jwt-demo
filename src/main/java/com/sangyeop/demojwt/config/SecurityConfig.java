@@ -1,7 +1,8 @@
 package com.sangyeop.demojwt.config;
 
-import com.sangyeop.demojwt.account.JwtAuthenticationFilter;
-import com.sangyeop.demojwt.account.JwtProvider;
+import com.sangyeop.demojwt.jwt.JwtAuthenticationFilter;
+import com.sangyeop.demojwt.jwt.JwtProvider;
+import com.sangyeop.demojwt.jwt.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtProvider jwtProvider;
+    private final TokenRepository tokenRepository;
 
     @Bean
     @Override
@@ -33,10 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/accounts/sign-up", "/api/accounts/sign-in").permitAll()
+                .antMatchers("/api/auth/sign-up", "/api/auth/sign-in").permitAll()
                 .anyRequest().hasRole("USER")
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, tokenRepository), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
     }
 }
